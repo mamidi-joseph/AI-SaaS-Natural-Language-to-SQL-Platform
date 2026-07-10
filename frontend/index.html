@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NL to SQL — Query Assistant</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            font-size: 22px;
+        }
+
+        input[type="text"] {
+            width: 70%;
+            padding: 10px;
+            font-size: 15px;
+        }
+
+        button {
+            padding: 10px 16px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        #sql-box {
+            background: #f4f4f4;
+            padding: 10px;
+            margin-top: 15px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background: #eee;
+        }
+
+        #status {
+            color: #666;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Ask your database a question</h1>
+
+    <input
+        type="text"
+        id="question"
+        placeholder="e.g. Which customers ordered more than one product?"
+    >
+
+    <button onclick="runQuery()">Ask</button>
+
+    <div id="status"></div>
+
+    <div id="sql-box" style="display:none;"></div>
+
+    <table id="results-table" style="display:none;"></table>
+
+    <script>
+        async function runQuery() {
+            const question = document.getElementById("question").value;
+            const status = document.getElementById("status");
+            const sqlBox = document.getElementById("sql-box");
+            const table = document.getElementById("results-table");
+
+            status.textContent = "Thinking...";
+            sqlBox.style.display = "none";
+            table.style.display = "none";
+
+            try {
+                const res = await fetch("http://localhost:8000/query", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ question })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    status.textContent =
+                        "Error: " + (data.detail || "Unknown error");
+                    return;
+                }
+
+                status.textContent = "";
+
+                sqlBox.style.display = "block";
+                sqlBox.textContent = "Generated SQL:\n" + data.sql;
+
+                renderTable(data.results);
+
+            } catch (err) {
+                status.textContent = "Request failed: " + err.message;
+            }
+        }
+
+        function renderTable(rows) {
+            const table = document.getElementById("results-table");
+            table.innerHTML = "";
+
+            if (!rows || rows.length === 0) {
+                table.style.display = "none";
+                return;
+            }
+
+            const headers = Object.keys(rows[0]);
+
+            const headRow = document.createElement("tr");
+
+            headers.forEach(header => {
+                const th = document.createElement("th");
+                th.textContent = header;
+                headRow.appendChild(th);
+            });
+
+            table.appendChild(headRow);
+
+            rows.forEach(row => {
+                const tr = document.createElement("tr");
+
+                headers.forEach(header => {
+                    const td = document.createElement("td");
+                    td.textContent = row[header];
+                    tr.appendChild(td);
+                });
+
+                table.appendChild(tr);
+            });
+
+            table.style.display = "table";
+        }
+    </script>
+
+</body>
+</html>
