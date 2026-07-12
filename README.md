@@ -425,7 +425,7 @@ List all products in the Electronics category
 
 AI & Backend Developer
 
-GitHub: https://github.com/mamidi80
+GitHub: https://github.com/mamidi-joseph
 
 ---
 
