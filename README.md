@@ -122,9 +122,9 @@ Follow the steps below to run the project on your own computer.
 ## Step 1 – Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git
+git clone https://github.com/mamidi-joseph/AI-SaaS-Natural-Language-to-SQL-Platform.git
 
-cd YOUR_REPOSITORY
+cd AI-SaaS-Natural-Language-to-SQL-Platform
 ```
 
 Replace **YOUR_USERNAME** and **YOUR_REPOSITORY** with your GitHub repository details.
